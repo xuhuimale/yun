@@ -1,0 +1,730 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> 静态测试页面 </title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+
+<link type="text/css" href="jquery-ui-1.8.20/css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+ </head>
+
+<style type="text/css">
+	body,p,b,dl,dd,table,td,th,input,button,textarea,xmp,pre,img,form,div,ul,ol,li,h1,h2,h3,h4,h5,h6{margin:0;padding:0;}
+
+	body{
+		font:14px/1.14 Arial;
+	}
+	div {
+		border:0px solid;
+		background-color:white;
+		float:left;
+	}
+
+	#main {
+		width:960px;
+		margin-left:auto;
+		margin-right:auto;
+		float:none;
+		z-index:1;
+	}
+	#top {
+		height:80px;
+		width:960px;
+		position:fixed;
+		z-index:1;
+		float:none;
+		background:url('./image/top_bg.gif') left;
+		background-color:transparent;
+	}
+	#logo {
+		float:left;
+		height:100%;
+		width:160px;
+		background-color:transparent;
+	}
+	#loginfo {
+		float:right;
+		height:100%;
+		background-color:transparent;
+		z-index:1;
+	}
+	#left {
+		width:160px;
+		margin-top:80px;
+		margin-bottom:0px;
+		margin-left:auto;
+		margin-right:auto;
+		float:left;
+		position:fixed;
+		z-index:1;
+	}
+	#used {
+		height:60px;
+	}
+
+	#unused {
+		height:60px;
+	}
+	
+	#work {
+		width:800px;
+		margin-top:80px;
+		margin-bottom:0px;
+		margin-left:auto;
+		margin-right:auto;
+		float:right;
+	}
+	#fileNav {
+		width:800px;
+		height:50px;
+		line-height:50px;
+		margin-top:0px;
+		margin-bottom:0px;
+		position:fixed;
+		z-index:1;
+		overflow: hidden;
+		text-align: center;
+	}
+	#toolBar {
+		width:800px;
+		height:50px;
+		margin-top:50px;
+		margin-bottom:0px;
+		position:fixed;
+		z-index:1;
+	}
+	#fileList {
+		margin-top:100px;
+	}
+
+
+
+
+	
+	#toolBar li{ 
+		list-style:none;
+		padding-top:10px;
+		padding-bottom:10px;
+	}	
+
+	.button, .button:visited {
+		background: #222 url(overlay.png) repeat-x; 
+		display: inline-block; 
+		padding: 5px 10px 6px; 
+		color: #fff; 
+		text-decoration: none;
+		-moz-border-radius: 6px; 
+		-webkit-border-radius: 6px;
+		-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+		-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+		text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+		border-bottom: 1px solid rgba(0,0,0,0.25);
+		position: relative;
+		cursor: pointer
+	}
+ 
+	.button:hover							{ background-color: #111; color: #fff; }
+	.button:active							{ top: 1px; }
+	.small.button, .small.button:visited 	{ font-size: 11px}
+	.button, .button:visited,
+	.medium.button, .medium.button:visited 	{ font-size: 13px; 
+											  font-weight: bold; 
+											  line-height: 1; 
+											  text-shadow: 0 -1px 1px rgba(0,0,0,0.25); 
+											}
+												  
+	.large.button, .large.button:visited 		{ font-size: 14px; 
+												  padding: 8px 14px 9px; }
+												  
+	.super.button, .super.button:visited 		{ font-size: 34px; 
+												  padding: 8px 14px 9px; }
+	
+	.pink.button, .magenta.button:visited		{ background-color: #e22092; }
+	.pink.button:hover							{ background-color: #c81e82; }
+	.green.button, .green.button:visited		{ background-color: #91bd09; }
+	.green.button:hover						    { background-color: #749a02; }
+	.red.button, .red.button:visited			{ background-color: #e62727; }
+	.red.button:hover							{ background-color: #cf2525; }
+	.orange.button, .orange.button:visited		{ background-color: #ff5c00; }
+	.orange.button:hover						{ background-color: #d45500; }
+	.blue.button, .blue.button:visited		    { background-color: #2981e4; }
+	.blue.button:hover							{ background-color: #2575cf; }
+	.yellow.button, .yellow.button:visited		{ background-color: #ffb515; }
+	.yellow.button:hover						{ background-color: #fc9200; }
+
+</style>
+
+ <body>
+  <input type="hidden" id="serviceId" value="sina"></input>
+  <input type="hidden" id="dir" value="333333"></input>
+
+  <div id="main">
+    <div id="top">
+		<div id="logo">个人云存储整合运营商</div>
+		<div id="loginfo">退出</div>
+	</div>    
+	
+	<div id="left">
+		<ul id="used">
+			<li><a href="#">dropbox</a></li>
+			<li><a href="#">SINA微盘</a></li>
+		</ul>
+		<ul id="unused">
+			<li><a href="javascript:alert('待添加');">阿里云</a></li>
+			<li><a href="javascript:alert('待添加');">百度网盘</a></li>
+		</ul>
+	</div>
+
+	<div id="work">
+		<div id="fileNav">
+<style type="text/css">
+	.ellipsis {
+		display:block;
+		width: 100px; 
+		overflow: hidden; 
+		white-space: nowrap;
+		text-overflow:ellipsis;
+		float:left;
+		text-align:left;
+	}
+</style>
+
+			<!-- 文件导航 start -->
+			<!-- 云服务logo图片 -->
+			<a id="serviceLogo" style="float:left;width:32px;" title="回到首页" href="#"><IMG style="border:0px" SRC='./image/logo/sina.png'></img></a>
+			<!-- 云服务名称 -->
+			<div id="serviceName" style="float:left;text-align:left;">SINA微盘</div>
+			<!-- 当前位置，根目录时为空 -->
+			<div id="currentDir" style="white-space:nowrap;">
+				<a href="#"><span class="ellipsis" title="ddddddddd">【当前位置，根目录时为空当前位置，根目录时为空当前位置，根目录时为空】</span></a>
+				<span style="float:left;">&#160;&#160;-->&#160;&#160;</span>
+				<a href="#"><span class="ellipsis" title="ddddddddd">[1111111111111111111111111111111]</span></a>
+				<span style="float:left;">&#160;&#160;-->&#160;&#160;</span>
+				<a href="#"><span class="ellipsis" title="ddddddddd">[2222222222222222222]</span></a>
+				<span style="float:left;">&#160;&#160;-->&#160;&#160;</span>
+				<a href="#"><span class="ellipsis" title="ddddddddd">[333]</span></a>
+			</div>
+			<!-- 文件导航 end -->
+		</div>
+
+
+
+
+
+		<div id="toolBar">
+			<li>
+
+
+<!-- ALL jQuery Tools. No jQuery library -->
+<script src="http://cdn.jquerytools.org/1.2.7/all/jquery.tools.min.js"></script>
+
+	<script>
+	$(function() {
+		$( "#progressbar" ).progressbar({
+			value: 31
+		});
+
+		/* 删除按钮的”监听“事件*/
+		$("#btnDelete").bind("deleteTrigger", function (event) {
+			var count = ($("#fileTable tbody input:checked").length);
+			if(count > 0) {
+				$(this).text("删除(" + count + ")");
+			}else {
+				$(this).text("删除");
+			}
+		});
+	});
+
+	/* 删除按钮 */
+	function deleteFile() {
+				var checkedBoxes = ($("#fileTable tbody input:checked"));
+				var count = 0;
+				var checkedLength = checkedBoxes.length;
+				var fileIds = new Array();
+				for (var i = 0; i < checkedLength; i++) {
+					count++;
+					fileIds.push(checkedBoxes[i].value);
+				}
+				alert(fileIds.join("~"));
+				alert($("input[type='hidden'][id='serviceId']").val());
+	}
+
+
+	</script>
+
+
+
+
+				<!-- 空间统计、上传 -->
+				<div id="spaceStatistic" style="float:left">
+					<div id="progressbar" style="width:300px">已使用31%</div>
+					<a class="large button green" id="btnUpload">上传</a>
+				</div>
+
+<!-- 上传按钮 相关 -->
+  <style>
+    #uploadbox {
+		/* overlay is hidden before loading */
+		display:none;
+		/* standard decorations */
+		width:400px;
+		border:10px solid #666;
+		/* for modern browsers use semi-transparent color on the border. nice! */
+		border:10px solid rgba(82, 82, 82, 0.698);
+		/* hot CSS3 features for mozilla and webkit-based browsers (rounded borders) */
+		-moz-border-radius:8px;
+		-webkit-border-radius:8px;
+    }
+
+    #uploadbox div {
+		padding:10px;
+		float:none;
+		border:1px solid #749A02;
+		background-color:#fff;
+		font-family:"lucida grande",tahoma,verdana,arial,sans-serif
+    }
+
+    #uploadbox h2 {
+		margin:-11px;
+		margin-bottom:0px;
+		color:#fff;
+		background-color:#91BD09;
+		padding:5px 10px;
+		border:1px solid #749A02;
+		font-size:20px;
+    }
+	#uploadbox #uploadFileName {
+		padding:0px;
+	}
+	#uploadbox #uploadProcess {
+		border:0px;
+		padding:0px;
+	}
+	#uploadbox .ui-progressbar-value { background-image: url(image/pbar-ani.gif) !important; }
+
+  </style>
+  <!--[if IE]>
+  <style type="text/css">
+    .uploadbox {
+	    background:transparent;
+	    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#333333,endColorstr=#333333);
+	    zoom: 1;
+    }
+  </style>
+  <![endif]-->
+<!-- upload dialog -->
+
+
+<div id="uploadbox">
+  <div>
+    <h2>上传文件</h2>
+    <p>
+      单个文件最大支持100M。
+    </p>
+    <form ENCTYPE="multipart/form-data" method="post">
+      <input type="file" onchange="doUploadFile(this)"/>
+	  <div id="uploadFileName" style="display:none"></div>
+	  <div id="uploadProcess" style="display:none"></div>
+    </form>
+    <p style="color:#666">
+      To close, click the Close button or hit the ESC key.
+    </p>
+    <!-- yes/no buttons -->
+    <p>
+      <button class="close"> 取消上传 </button>
+    </p>
+  </div>
+</div>
+
+<script>
+ /* 根据全路径获取文件名 */
+ function getFileName(str){ 
+  var reg = /[^\\\/]*[\\\/]+/g; 
+  //xxx\或者是xxx/ 
+  str = str.replace(reg,''); 
+  return str; 
+ }
+ /* 选择文件后立即执行上传 */
+ function doUploadFile(objFile){
+	var filePath = $(objFile).val();
+	// alert(filePath);
+	var fileName = getFileName(filePath);
+	//alert(getFileName(filePath));
+	$(objFile).hide();
+	// 进度条
+	$("#uploadFileName").text(fileName).show();
+	$("#uploadProcess").show();
+ }
+
+
+/* 上传按钮 */
+$(document).ready(function() {
+    $("#uploadProcess").progressbar({
+      value: 100
+    });
+
+
+  // 上传按钮点击弹出对话框
+  $("#btnUpload").click(function() {
+	  // 清空已经选择的文件
+	  var objFile = $("#uploadbox form input")[0];
+	  objFile.outerHTML=objFile.outerHTML;
+	  //alert(objFile.outerHTML);
+
+	  $("#uploadbox form input").show();
+      $("#uploadbox").overlay().load();
+  });
+
+
+  $("#main").append(document.getElementById("uploadbox").outerHTML);
+  $("#uploadbox").remove();
+
+    // select the overlay element - and "make it an overlay"
+  $("#uploadbox").overlay({
+    // custom top position
+    top: 180,
+    // some mask tweaks suitable for facebox-looking dialogs
+    mask: {
+		// you might also consider a "transparent" color for the mask
+		color: '#fff',
+		// load mask a little faster
+		loadSpeed: 200,
+		// very transparent
+		opacity: 0.5
+    },
+    // disable this for modal dialog-type of overlays
+    closeOnClick: false,
+    // load it immediately after the construction
+    load: false
+
+  });
+
+
+});
+
+ 
+</script>
+
+
+
+
+<!-- “新建文件夹”按钮 相关 -->
+  <style>
+    #newdirbox {
+		/* overlay is hidden before loading */
+		display:none;
+		/* standard decorations */
+		width:400px;
+		border:10px solid #666;
+		/* for modern browsers use semi-transparent color on the border. nice! */
+		border:10px solid rgba(82, 82, 82, 0.698);
+		/* hot CSS3 features for mozilla and webkit-based browsers (rounded borders) */
+		-moz-border-radius:8px;
+		-webkit-border-radius:8px;
+    }
+
+    #newdirbox div {
+		padding:10px;
+		float:none;
+		border:1px solid #749A02;
+		background-color:#fff;
+		font-family:"lucida grande",tahoma,verdana,arial,sans-serif
+    }
+
+    #newdirbox h2 {
+		margin:-11px;
+		margin-bottom:0px;
+		color:#fff;
+		background-color:#91BD09;
+		padding:5px 10px;
+		border:1px solid #749A02;
+		font-size:20px;
+    }
+  </style>
+  <!--[if IE]>
+  <style type="text/css">
+    .newdirbox {
+	    background:transparent;
+	    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#333333,endColorstr=#333333);
+	    zoom: 1;
+    }
+  </style>
+  <![endif]-->
+<!-- newdirbox dialog -->
+<div id="newdirbox">
+  <div>
+    <h2>新建文件夹</h2>
+    <p>
+      请输入文件夹名称
+    </p>
+    <!-- input form. you can press enter too -->
+    <form>
+      <input />
+      <button type="submit"> 确定 </button>
+      <button type="button" class="close"> 取消 </button>
+    </form>
+  </div>
+</div>
+
+<script>
+/* 上传按钮 */
+$(document).ready(function() {
+  $("#btnNewdir").click(function() {
+      $("#newdirbox").overlay().load();
+  });
+
+
+  $("#main").append(document.getElementById("newdirbox").outerHTML);
+  $("#newdirbox").remove();
+
+    // select the overlay element - and "make it an overlay"
+  var newdirboxTrigger = $("#newdirbox").overlay({
+    // custom top position
+    top: 180,
+    // some mask tweaks suitable for facebox-looking dialogs
+    mask: {
+		// you might also consider a "transparent" color for the mask
+		color: '#fff',
+		// load mask a little faster
+		loadSpeed: 200,
+		// very transparent
+		opacity: 0.5
+    },
+    // disable this for modal dialog-type of overlays
+    closeOnClick: false,
+    // load it immediately after the construction
+    load: false
+  });
+
+    $("#newdirbox form").submit(function(e) {
+      // close the overlay
+      //$("#newdirbox").overlay().close();
+      // get user input	
+      var input = $("input", this).val();
+      // do something with the answer
+      alert(input);
+      // do not submit the form
+      return e.preventDefault();
+  });
+
+});
+</script>
+
+
+				<!-- 操作按钮 -->
+				<div style="float:right">
+					<a class="large button green" id="btnNewdir">新建文件夹</a>
+					<a class="large button green" id="btnDelete" href="javascript:deleteFile();">删除</a>
+					<a class="large button green">复制</a>
+					<a class="large button green">移动</a>
+				</div>
+			</li>
+		</div>
+		<div id="fileList" style="">
+
+
+<link type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css" rel="stylesheet" />
+
+
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
+<script src="FixedHeader-2.0.6/js/FixedHeader.min.js"></script>
+
+<style type="text/css">
+#fileTable {
+	width:800px;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+	var oTable = $('#fileTable').dataTable({
+		"aaSorting": [],
+		//"bSort": false,
+		"bPaginate": false,
+		"bFilter": false,
+		"bInfo": false,
+		"aoColumns": [
+            { "bSortable": false, "sWidth":"10px"  },
+            null,
+            null,
+            {"sWidth":"60px"},
+            {"sWidth":"80px"}
+        ]
+	});
+	new FixedHeader( oTable, {
+		offsetTop:180
+	} ); 
+
+	/* 监听复选框的选中事件 */
+	$("#fileTable input[name='fileId']").bind("checkEvent", function (event) {
+		$("#btnDelete").trigger("deleteTrigger");
+	});
+
+	/* 列表上的复选框选中时，执行”复选框选中事件*/
+	$("#fileTable input[name='fileId']").click( function () {
+		$(this).trigger("checkEvent");
+	});
+	
+
+} );
+	
+	/*全选按钮的onclick事件*/
+	function funFileListSelectAll(box) {
+		//$("#fileTable input[name='fileId']").trigger("checkEvent");
+		var ifSelAll = box.checked;
+		$("#fileTable input[name='fileId']").each(function(){
+			$(this).attr("checked",ifSelAll);
+			$(this).trigger("checkEvent");
+		});  
+		//$("#btnDelete").trigger("myEvent");
+	}
+</script>
+
+<!-- 文件列表 -->
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="fileTable">
+	<thead>
+		<tr>
+			<th><input type="checkbox" id="fileListSelectAll" onclick="funFileListSelectAll(this);"></th>
+			<th>文件名</th>
+			<th>文件类型</th>
+			<th>文件大小</th>
+			<th>添加时间</th>
+		</tr>
+	</thead>
+	<tbody>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="/yun/frame.php?drive=sina&dir=44292843&path=/DataTables-1.9.1">DataTables-1.9.1</a></td>
+    <td></td>
+    <td bytes="" style="text-align:right;"></td>
+    <td style="text-align:center;">2012-05-16</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="/yun/frame.php?drive=sina&dir=43877408&path=/[视觉化思考软体].Mindjet.MindManager.2012.v10.0.493.Incl.Keymaker-CORE">[视觉化思考软体].Mindjet.MindManager.2012.v10.0.493.Incl.Keymaker-CORE</a></td>
+    <td></td>
+    <td bytes="" style="text-align:right;"></td>
+    <td style="text-align:center;">2012-05-15</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/dba597a4058e46ac883b354637a33b4643a2d123?ip=1337239535,220.181.136.229&ssig=UcVGmhY7mh&Expires=1337238335&KID=sae,l30zoo1wmz&fn=%E4%BA%A7%E5%93%81%E6%9E%B6%E6%9E%84%E5%BC%80%E5%8F%91%E6%96%B9%E6%B3%95%EF%BC%882011%E4%B8%AD%E5%9B%BD%E8%BD%AF%E4%BB%B6%E6%8A%80%E6%9C%AF%E5%A4%A7%E4%BC%9A%EF%BC%89.pdf">产品架构开发方法（2011中国软件技术大会）.pdf</a></td>
+    <td>application/pdf</td>
+    <td bytes="4656718" style="text-align:right;">4.44 MB</td>
+    <td style="text-align:center;">2012-05-07</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/385e4264ea67290907173b4fdee6478b52181971?ip=1337239466,220.181.136.230&ssig=P73SY5WNUB&Expires=1337238266&KID=sae,l30zoo1wmz&fn=01s0201NoSQL%E5%9C%A8%E8%85%BE%E8%AE%AF%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5+-+%E5%90%B4%E6%82%A6.pdf">01s0201NoSQL在腾讯应用实践 - 吴悦.pdf</a></td>
+    <td>application/pdf</td>
+    <td bytes="3951213" style="text-align:right;">3.77 MB</td>
+    <td style="text-align:center;">2012-05-03</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/57f23e46f62ab9a9e004f2bcb3f9c65fb9e3f8d4?ip=1337239136,220.181.136.230&ssig=GciBLUvLiS&Expires=1337237936&KID=sae,l30zoo1wmz&fn=HTML5%2BCSS3+W3C%E8%A7%84%E8%8C%83+chm%E7%89%88%E4%B8%AD%E6%96%87%E5%8F%82%E8%80%83%E6%89%8B%E5%86%8C.zip">HTML5+CSS3 W3C规范 chm版中文参考手册.zip</a></td>
+    <td>application/x-zip</td>
+    <td bytes="567190" style="text-align:right;">553.9 KB</td>
+    <td style="text-align:center;">2012-05-02</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="/yun/frame.php?drive=sina&dir=39569729&path=/十渡">十渡</a></td>
+    <td></td>
+    <td bytes="" style="text-align:right;"></td>
+    <td style="text-align:center;">2012-05-02</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="/yun/frame.php?drive=sina&dir=37895698&path=/axure">axure</a></td>
+    <td></td>
+    <td bytes="" style="text-align:right;"></td>
+    <td style="text-align:center;">2012-04-27</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/de1a76aa2968d55dca53967c796d6e2235dd68fd?ip=1337239136,220.181.136.230&ssig=etaBEqhcHJ&Expires=1337237936&KID=sae,l30zoo1wmz&fn=%E9%A1%B9%E7%9B%AE%E5%BB%BA%E8%AE%AE%E4%B9%A6.pages">项目建议书.pages</a></td>
+    <td>application/octet-stream</td>
+    <td bytes="572301" style="text-align:right;">558.89 KB</td>
+    <td style="text-align:center;">2012-04-26</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/bbdec5a20899b2bdc66c4436a5f3cd971ef3259a?ip=1337239087,220.181.136.230&ssig=LjdP421AOT&Expires=1337237887&KID=sae,l30zoo1wmz&fn=%E9%A1%B9%E7%9B%AE%E5%BB%BA%E8%AE%AE%E4%B9%A6.doc">项目建议书.doc</a></td>
+    <td>application/msword</td>
+    <td bytes="67584" style="text-align:right;">66 KB</td>
+    <td style="text-align:center;">2012-04-26</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://image.data.vdisk.me/2222237/78d46521abd38a5af12c242c6f0bc5efc9bb4008?ip=1337239101,220.181.136.229&ssig=Bd1y5zK2fh&Expires=1337237901&KID=sae,l30zoo1wmz&fn=BJCZ_%E6%9D%8E%E9%A2%96%E8%8A%9D_800x1200.jpg">BJCZ_李颖芝_800x1200.jpg</a></td>
+    <td>image/jpeg</td>
+    <td bytes="212726" style="text-align:right;">207.74 KB</td>
+    <td style="text-align:center;">2012-04-26</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://image.data.vdisk.me/2222237/e87c237b5d9013c2589412e5db6028123152564a?ip=1337239130,220.181.136.230&ssig=iZfYE9lLX%2B&Expires=1337237930&KID=sae,l30zoo1wmz&fn=%E4%BA%A7%E5%93%81%E8%BF%90%E8%90%A5%E7%9F%A5%E8%AF%86%E4%B8%80%E7%BD%91%E6%89%93%E5%B0%BD.jpg">产品运营知识一网打尽.jpg</a></td>
+    <td>image/jpeg</td>
+    <td bytes="510210" style="text-align:right;">498.25 KB</td>
+    <td style="text-align:center;">2012-04-13</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/860db60f2fab1b81e11fd9abfaaeeeff3267c08b?ip=1337239084,220.181.136.229&ssig=NVLSXsa1OL&Expires=1337237884&KID=sae,l30zoo1wmz&fn=TuanGou01.zip">TuanGou01.zip</a></td>
+    <td>application/x-zip</td>
+    <td bytes="38844" style="text-align:right;">37.93 KB</td>
+    <td style="text-align:center;">2012-03-31</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/771e084459cdbf6cbed9eb62ae29a90a27ee1a8f?ip=1337239147,220.181.136.229&ssig=JCSgbsMM1O&Expires=1337237947&KID=sae,l30zoo1wmz&fn=2011-2012%E5%B9%B4%E4%B8%AD%E5%9B%BD%E6%99%BA%E8%83%BD%E6%89%8B%E6%9C%BA%E5%B8%82%E5%9C%BA%E7%A0%94%E7%A9%B6%E6%8A%A5%E5%91%8A%E7%AE%80%E7%89%88.pdf">2011-2012年中国智能手机市场研究报告简版.pdf</a></td>
+    <td>application/pdf</td>
+    <td bytes="682014" style="text-align:right;">666.03 KB</td>
+    <td style="text-align:center;">2012-03-28</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/7f746eb0782c0050859cc26b1238eabe0f483f77?ip=1337241018,220.181.136.230&ssig=AXWjir5J7N&Expires=1337239818&KID=sae,l30zoo1wmz&fn=cocos2d-chinese.zip">cocos2d-chinese.zip</a></td>
+    <td>application/x-zip</td>
+    <td bytes="19837610" style="text-align:right;">18.92 MB</td>
+    <td style="text-align:center;">2012-03-05</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/ccfe5cc6a1a45fd2011a2a24e39432d3d699efcb?ip=1337239155,220.181.136.229&ssig=tXB4BDBx8K&Expires=1337237955&KID=sae,l30zoo1wmz&fn=%E4%BC%81%E4%B8%9A%E7%A7%81%E6%9C%89%E4%BA%91%E5%8F%8A%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84+20120218.pdf">企业私有云及系统架构 20120218.pdf</a></td>
+    <td>application/pdf</td>
+    <td bytes="764061" style="text-align:right;">746.15 KB</td>
+    <td style="text-align:center;">2012-02-23</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/4d54c6d79e13e4a12111f0c544accc8c11638af3?ip=1337239134,220.181.136.229&ssig=o%2FO4CtlAEz&Expires=1337237934&KID=sae,l30zoo1wmz&fn=%E8%A7%A6%E5%8A%A8%E4%BA%BA%E5%BF%83%E2%80%94%E2%80%94%E8%AE%BE%E8%AE%A1%E4%BC%98%E7%A7%80%E7%9A%84iPhone%E5%BA%94%E7%94%A8.rar">触动人心——设计优秀的iPhone应用.rar</a></td>
+    <td>application/x-rar-compressed</td>
+    <td bytes="546328" style="text-align:right;">533.52 KB</td>
+    <td style="text-align:center;">2012-02-23</td>
+</tr>
+<tr>
+	<td><input type="checkbox" name="fileId" value="1"></td>
+    <td><a href="http://data.vdisk.me/2222237/b94c17dbca633b6d169d5d9a85fe27467a968410?ip=1337239476,220.181.136.230&ssig=9eVnawU8%2Fl&Expires=1337238276&KID=sae,l30zoo1wmz&fn=HTML5%E7%A0%94%E7%A9%B6%E5%B0%8F%E7%BB%84%E3%80%8A%E5%BE%AE%E5%91%A8%E5%88%8A%E3%80%8B%E7%AC%AC28%E6%9C%9F.pdf">HTML5研究小组《微周刊》第28期.pdf</a></td>
+    <td>application/pdf</td>
+    <td bytes="4039981" style="text-align:right;">3.85 MB</td>
+    <td style="text-align:center;">2012-02-23</td>
+</tr>
+	</tbody>
+
+</table>
+
+
+
+		</div>
+	</div>
+
+  </div>
+ </body>
+</html>
