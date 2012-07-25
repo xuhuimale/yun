@@ -413,7 +413,7 @@ class API
 	 * @param array $params Additional parameters
 	 * @return mixed
 	 */
-	private function fetch($method, $url, $call, array $params = array())
+	public function fetch($method, $url, $call, array $params = array())
 	{
 		// Make the API call via the consumer
 		$response = $this->OAuth->fetch($method, $url, $call, $params);

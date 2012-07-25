@@ -52,6 +52,23 @@ class Service {
 				break;
 		}
 	}
+	
+    private function getSinaVdisk() {
+		$appkey = 2106527290;
+		$appsecret = '7bddc9daaeae5d45283be7a92a893cb5';
+		$username = 'xuhui.male@gmail.com';
+		$password = 'huiwolf824613';
+
+		$vdisk = new vDisk($appkey, $appsecret);
+        
+        if(empty($_SESSION['token'])) {
+    		$vdisk->get_token($username, $password, 'sinat');
+    		$_SESSION['token'] = $vdisk->token;
+		}
+		$vdisk->keep_token($_SESSION['token']);
+		
+		return $vdisk;
+    }
    
 	/* 获取网盘的容量信息 */
 	function get_quota() {
@@ -59,27 +76,27 @@ class Service {
 		switch($this -> serviceId) {
 			case "sina":
 				//include_once('vDisk.class.php');
-				$appkey = 2106527290;
-				$appsecret = '7bddc9daaeae5d45283be7a92a893cb5';
-				$username = 'xuhui.male@gmail.com';
-				$password = 'huiwolf824613';
 
-				$vdisk = new vDisk($appkey, $appsecret);
-                
-                if(empty($_SESSION['token'])) {
-    				$vdisk->get_token($username, $password, 'sinat');
-    				$_SESSION['token'] = $vdisk->token;
-			    }
-
-				$vdisk->keep_token($_SESSION['token']);
+				$vdisk = $this -> getSinaVdisk();
 				$r = ($vdisk->get_quota());
 				//print_r($r);
 				$result["used"] = $r['data']['used'];
 				$result["total"] = $r['data']['total'];
 				return $result;
 				break;
-			default:
+			case "dropbox":
+    			// Require the bootstrap
+                require_once('Dropbox/bootstrap.php');
+                
+                // Retrieve the account information
+                $accountInfo = $dropbox->accountInfo();
+                
+				$result["used"] = $accountInfo['body']->quota_info->normal;
+				$result["total"] = $accountInfo['body']->quota_info->quota;
+				return $result;
 				break;
+			default :
+			    break;
 		}
 	}
 	
@@ -103,19 +120,8 @@ class Service {
 		switch($this -> serviceId) {
 			case "sina":
 				//include_once('vDisk.class.php');
-				$appkey = 2106527290;
-				$appsecret = '7bddc9daaeae5d45283be7a92a893cb5';
-				$username = 'xuhui.male@gmail.com';
-				$password = 'huiwolf824613';
-
-				$vdisk = new vDisk($appkey, $appsecret);
-
-                if(empty($_SESSION['token'])) {
-    				$vdisk->get_token($username, $password, 'sinat');
-    				$_SESSION['token'] = $vdisk->token;
-			    }
-
-				$vdisk->keep_token($_SESSION['token']);
+				
+				$vdisk = $this -> getSinaVdisk();
 				$r = $vdisk->get_list($dir == null ? "0" : $dir);
 				//print_r($r);
 				
@@ -143,13 +149,52 @@ class Service {
 					}
 					//print_r($result);
 				} else {
+				    
 					// echo "错误".$r["err_msg"];
 					$result = null;
 				}
 				
 				break;
-			default:
+			case "dropbox":
+                // Require the bootstrap
+                require('Dropbox/bootstrap.php');
+                
+                // Get the metadata for the file/folder specified in $path
+                $fileList = $dropbox->metaData($dir == null ? "" : $dir);
+				if($fileList["code"] == "200") {
+					$i = 0;
+					foreach ($fileList["body"] -> contents as $value){
+                        //var_dump($value);
+                        
+                        $path_in_dropbox = $value->path;// Dropbox上获取到的完整路径
+                        $filename = substr(strrchr($path_in_dropbox, "/"), 1); // 通过路径截取出文件名
+						$file = new File();
+						$file -> fileId = $value->rev;
+						$file -> fileName = $filename;
+						//$file -> fileDirId = $value["dir_id"];
+						
+						if(!$value->is_dir) { // 代表是一个文件
+						    $file -> fileAddTime = date("Y-m-d", strtotime($value->modified));
+						    $file -> fileSize = $value->size;
+						    //$file -> fileBytes = $singleFileInfo["body"]->bytes; //获取文件字节数
+							//$singleFileInfo = $dropbox->metaData(null,$value->rev); // 获取单个文件详细信息
+						    $file -> fileType = $value->mime_type;
+							//$file -> fileUrl = $singleFileInfo["body"]["s3_url"]; // 获取文件的下载地址
+						} else { // 如果类型为空，代表是“文件夹”“目录”
+							$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$path_in_dropbox;//."&path=".$_REQUEST["path"]."/".$value["name"];
+						}
+						
+						$result[$value->rev] = $file;
+					}
+					//print_r($result);
+				} else {
+				    
+					// echo "错误".$r["err_msg"];
+					$result = null;
+				}
 				break;
+			default:
+			    break;
 		}
 		return $result;
 	}
@@ -169,19 +214,8 @@ class Service {
 					//print_r($dirNameArray);
 				}
 				//include_once('vDisk.class.php');
-				$appkey = 2106527290;
-				$appsecret = '7bddc9daaeae5d45283be7a92a893cb5';
-				$username = 'xuhui.male@gmail.com';
-				$password = 'huiwolf824613';
-
-				$vdisk = new vDisk($appkey, $appsecret);
-
-                if(empty($_SESSION['token'])) {
-    				$vdisk->get_token($username, $password, 'sinat');
-    				$_SESSION['token'] = $vdisk->token;
-			    }
-
-				$vdisk->keep_token($_SESSION['token']);
+				
+				$vdisk = $this -> getSinaVdisk();
 //				echo "dir=$dir";
 				
 				for ($i = 0; $i < count($dirNameArray); $i++) {
@@ -219,19 +253,8 @@ class Service {
 		switch($this -> serviceId) {
 			case "sina":
 
-				$appkey = 2106527290;
-				$appsecret = '7bddc9daaeae5d45283be7a92a893cb5';
-				$username = 'xuhui.male@gmail.com';
-				$password = 'huiwolf824613';
-
-				$vdisk = new vDisk($appkey, $appsecret);
-
-                if(empty($_SESSION['token'])) {
-    				$vdisk->get_token($username, $password, 'sinat');
-    				$_SESSION['token'] = $vdisk->token;
-			    }
-
-				$vdisk->keep_token($_SESSION['token']);
+				
+				$vdisk = $this -> getSinaVdisk();
 				
 				if($file->fileType != null || $file->fileType != "") { // 删除文件
 					$result = $vdisk->delete_file($file->fileId);
@@ -255,19 +278,8 @@ class Service {
 		switch($this -> serviceId) {
 			case "sina":
 
-				$appkey = 2106527290;
-				$appsecret = '7bddc9daaeae5d45283be7a92a893cb5';
-				$username = 'xuhui.male@gmail.com';
-				$password = 'huiwolf824613';
-
-				$vdisk = new vDisk($appkey, $appsecret);
-
-                if(empty($_SESSION['token'])) {
-    				$vdisk->get_token($username, $password, 'sinat');
-    				$_SESSION['token'] = $vdisk->token;
-			    }
-
-				$vdisk->keep_token($_SESSION['token']);
+				
+				$vdisk = $this -> getSinaVdisk();
 				
 				if($parent_dir_id == null || $parent_dir_id == "") {
 					$parent_dir_id = 0;
@@ -291,19 +303,8 @@ class Service {
 		switch($this -> serviceId) {
 			case "sina":
 
-				$appkey = 2106527290;
-				$appsecret = '7bddc9daaeae5d45283be7a92a893cb5';
-				$username = 'xuhui.male@gmail.com';
-				$password = 'huiwolf824613';
-
-				$vdisk = new vDisk($appkey, $appsecret);
-
-                if(empty($_SESSION['token'])) {
-    				$vdisk->get_token($username, $password, 'sinat');
-    				$_SESSION['token'] = $vdisk->token;
-			    }
-
-				$vdisk->keep_token($_SESSION['token']);
+				
+				$vdisk = $this -> getSinaVdisk();
 				
 				if($parent_dir_id == null || $parent_dir_id == "") {
 					$parent_dir_id = 0;

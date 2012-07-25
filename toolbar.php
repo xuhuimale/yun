@@ -6,6 +6,16 @@
 .ui-progressbar .ui-progressbar-value {margin: -1px; height:100%; background-image: none; background-color: #91bd09;}
 </style>
 
+
+<?php 
+	$r = $aService->get_quota(); 
+	if($r['total'] != 0) {
+		$toolbarUseRate = sprintf("%6.2f", $r['used']/$r['total']*100); 
+	} else {
+		$toolbarUseRate = 0;
+	}
+?>
+
 <script>
 
 function jsonToString (obj){   
@@ -40,14 +50,6 @@ function jsonToString (obj){
 	
 
 
-<?php 
-	$r = $aService->get_quota(); 
-	if($r['total'] != 0) {
-		$toolbarUseRate = sprintf("%6.2f", $r['used']/$r['total']*100); 
-	} else {
-		$toolbarUseRate = 0;
-	}
-?>
 /** 使用率统计进度条初始化 */
 $(function() {
 	if($("#serviceId").val() != "") {
