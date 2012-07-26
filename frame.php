@@ -25,7 +25,12 @@
 		background-color:white;
 		float:left;
 	}
-
+    ul,li{
+        list-style-type:none;
+        padding:0;
+        margin:0;
+    }
+    
 	#main {
 		width:960px;
 		margin-left:auto;
