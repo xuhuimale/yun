@@ -39,7 +39,7 @@ class Service {
 				$this -> dir = $dir;
 				$this -> uploadLimit = 10*1000*1000;
 				
-				require('vDisk.class.php');
+				require('sina/vDisk.class.php');
 
  
 				break;
