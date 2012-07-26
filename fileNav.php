@@ -22,8 +22,9 @@
 			<!-- 当前位置，根目录时为空 -->
 			<div id="currentDir">
 				<?php 
+				//echo $dir;
 				$fileNavDirStruct = ($aService -> get_dirStruct($dir)); 
-				//print_r($fileNavDirStruct);
+				// print_r($fileNavDirStruct);
 				if($fileNavDirStruct != null && count($fileNavDirStruct) > 0) {
 					$htmlFileNavDirStruct .= "<a href=\"".$fileNavDirStruct[0]->fileUrl."\" title=\"".$fileNavDirStruct[0]->fileName."\">\n";
 					$htmlFileNavDirStruct .= "<span class=\"ellipsis\">".$fileNavDirStruct[0]->fileName."</span>\n";

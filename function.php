@@ -210,16 +210,11 @@ class Service {
 		switch($this -> serviceId) {
 			case "sina":
 				$_path = substr($_REQUEST["path"], 1);
-				//echo "path=$_path======".strlen($_path);
 				if(strlen($_path) > 1) {
 					$dirNameArray = explode("/", $_path);
-					//echo "目录名称数据：";
-					//print_r($dirNameArray);
 				}
-				//include_once('vDisk.class.php');
 				
 				$vdisk = $this -> getSinaVdisk();
-//				echo "dir=$dir";
 				
 				for ($i = 0; $i < count($dirNameArray); $i++) {
 					$file = new File();
@@ -233,15 +228,28 @@ class Service {
 					$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$theDirInfo["data"]["id"]."&path=".$curFullPath;
 					$dirStruct[$i] = $file;
 				}
-				// 添加根目录链接
-				//$rootDir = new File();
-				//$rootDir -> fileId = 0;
-				//$rootDir -> fileName = "RRROOT";
-				//$rootDir -> fileUrl = "/yun/frame.php?drive=".$this->serviceId;
-				//$dirStruct = array_pad($dirStruct, (0-(count($dirStruct)+1)), $rootDir);
 
-				
 				break;
+				
+			case "dropbox":
+				$_path = substr($dir, 1);
+				if(strlen($_path) > 1) {
+					$dirNameArray = explode("/", $_path);
+				}
+				// print_r($dirNameArray);
+				
+				for ($i = 0; $i < count($dirNameArray); $i++) {
+					$file = new File();
+					$file -> fileName = $dirNameArray[$i];
+					
+					// 路径全名
+					$curFullPath = "/".join("/", array_slice($dirNameArray, 0, $i+1));
+					//echo $theDirInfo["err_msg"];
+					$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$curFullPath;
+					$dirStruct[$i] = $file;
+				}				
+			
+			    break;
 			default:
 				break;
 		}
