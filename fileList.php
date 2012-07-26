@@ -14,6 +14,8 @@
 $(document).ready(function() {
 	if($("#serviceId").val() != "") {
 		$('#fileTable').show();
+
+        /* 画表格方法 */
 		var oTable = $('#fileTable').dataTable({
 			"aaSorting": [],
 			//"bSort": false,
@@ -24,13 +26,28 @@ $(document).ready(function() {
 				{ "bSortable": false, "sWidth":"18px" },
 				null,
 				null,
-				{"sWidth":"60px"},
-				{"sWidth":"80px"}
+				{"sWidth":"60px", "sSortDataType":"dom-filebytes", "sType":"numeric"},
+				{"sWidth":"80px", "sType":"date"}
 			]
 		});
+		/* 固定表格头的位置 */
 		new FixedHeader( oTable, {
 			offsetTop:180
 		} ); 
+		
+		/* 修改文件大小一列的排序方法，按照实际的字节数进行排序。 */
+        $.fn.dataTableExt.afnSortData['dom-filebytes'] = function ( oSettings, iColumn )
+        {
+            var aData = [];
+            $( 'td:eq('+iColumn+') input', oSettings.oApi._fnGetTrNodes(oSettings) ).each( function () {
+                // alert(this.value);
+        		var value = this.value == "" ? -1 : this.value;
+        		// alert(value);
+                aData.push( value );
+            } );
+            //alert(aData.join("~"));
+            return aData;
+        };
 		
 		/* 监听复选框的选中事件 */
 		$("#fileTable input[name='fileId']").bind("checkEvent", function (event) {
@@ -82,20 +99,10 @@ $(document).ready(function() {
 			echo "    </td>\n";
 			echo "    <td><a href=\"" . $aFile -> fileUrl . "\">" . $aFile -> fileName . "</a></td>\n";
 			echo "    <td>" . $aFile -> fileType . "</td>\n";
-			echo "    <td bytes=\"".$aFile -> fileBytes."\" style=\"text-align:right;\">" . $aFile -> fileSize . "</td>\n";
+			echo "    <td bytes=".$aFile -> fileBytes." style=\"text-align:right;\">" . $aFile -> fileSize . "<input type=hidden value=".$aFile -> fileBytes."></td>\n";
 			echo "    <td style=\"text-align:center;\">" . $aFile -> fileAddTime . "</td>\n";
 			echo "</tr>\n";
 		}
-/*		for ($i = 0; $i < count($fileListTable); $i++) {
-			echo "<tr>\n";
-			echo "    <td style=\"text-align:center;\"><input type=\"checkbox\" name=\"fileId\" value=\"".$fileListTable[$i] -> fileId."\"></td>\n";
-			echo "    <td><a href=\"" . $fileListTable[$i] -> fileUrl . "\">" . $fileListTable[$i] -> fileName . "</a></td>\n";
-			echo "    <td>" . $fileListTable[$i] -> fileType . "</td>\n";
-			echo "    <td bytes=\"".$fileListTable[$i] -> fileBytes."\" style=\"text-align:right;\">" . $fileListTable[$i] -> fileSize . "</td>\n";
-			echo "    <td style=\"text-align:center;\">" . $fileListTable[$i] -> fileAddTime . "</td>\n";
-			echo "</tr>\n";
-		}
-*/
 		?>
 	</tbody>
 

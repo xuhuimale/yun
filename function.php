@@ -53,6 +53,9 @@ class Service {
 		}
 	}
 	
+	/**
+	  *新浪微盘对象
+	  */
     private function getSinaVdisk() {
 		$appkey = 2106527290;
 		$appsecret = '7bddc9daaeae5d45283be7a92a893cb5';
@@ -174,10 +177,10 @@ class Service {
 						//$file -> fileDirId = $value["dir_id"];
 						
 						if(!$value->is_dir) { // 代表是一个文件
+
 						    $file -> fileAddTime = date("Y-m-d", strtotime($value->modified));
 						    $file -> fileSize = $value->size;
-						    //$file -> fileBytes = $singleFileInfo["body"]->bytes; //获取文件字节数
-							//$singleFileInfo = $dropbox->metaData(null,$value->rev); // 获取单个文件详细信息
+						    $file -> fileBytes = $value->bytes; //获取文件字节数
 						    $file -> fileType = $value->mime_type;
 							//$file -> fileUrl = $singleFileInfo["body"]["s3_url"]; // 获取文件的下载地址
 						} else { // 如果类型为空，代表是“文件夹”“目录”
@@ -324,29 +327,6 @@ class Service {
 
 
 
-
-/**
-  * 处理URL，返回文本
-  */
-function fetch($url, $array=null) {
-    if(!empty($url)) {
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		// 下面两行是为了处理https
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-		if($array != null)
-		{
-		    curl_setopt($curl, CURLOPT_POST, true);
-		    curl_setopt($curl, CURLOPT_POSTFIELDS, $array);
-		}
-		$data = curl_exec($curl);
-		curl_close($curl);
-		
-		return $data;
-    }
-}
 
 ?>
 <?php
