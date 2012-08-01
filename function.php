@@ -1,5 +1,4 @@
 <?php
-  header("Content-Type:text/html; charset=utf-8");
   ini_set('display_errors', true);
   error_reporting(E_ALL &~ E_NOTICE );
 ?>
@@ -39,7 +38,7 @@ class Service {
 				$this -> dir = $dir;
 				$this -> uploadLimit = 10*1000*1000;
 				
-				require('sina/vDisk.class.php');
+				require("./sina/vDisk.class.php");
 
  
 				break;
@@ -49,6 +48,8 @@ class Service {
 				$this -> homepage = "https://www.dropbox.com/";
 				$this -> logoUrl = "./image/logo/dropbox.png";
 				$this -> dir = $dir;
+				
+				
 				break;
 		}
 	}
@@ -73,6 +74,15 @@ class Service {
 		return $vdisk;
     }
    
+	/**
+	  *Dropbox对象
+	  */
+    private function getDropboxDisk() {
+		require('Dropbox/bootstrap.php');
+		
+		return $dropbox;
+    }
+	
 	/* 获取网盘的容量信息 */
 	function get_quota() {
 		$result = array();
@@ -89,10 +99,10 @@ class Service {
 				break;
 			case "dropbox":
     			// Require the bootstrap
-                require_once('Dropbox/bootstrap.php');
+                //require('Dropbox/bootstrap.php');
                 
                 // Retrieve the account information
-                $accountInfo = $dropbox->accountInfo();
+                $accountInfo = $this -> getDropboxDisk()->accountInfo();
                 
 				$result["used"] = $accountInfo['body']->quota_info->normal;
 				$result["total"] = $accountInfo['body']->quota_info->quota;
@@ -115,6 +125,48 @@ class Service {
 				break;
 		}
 		return $file;
+	}
+	
+	/* 下载文件 */
+	function download_file() {
+	    switch($this -> serviceId) {
+	        case "dropbox":
+                // Require the bootstrap
+                //require('Dropbox/bootstrap.php');
+                
+	            $file_path = substr($_REQUEST["file_path"], 1);
+                $filename = substr(strrchr($_REQUEST["file_path"], "/"), 1); // 通过路径截取出文件名
+                $encoded_filename = urlencode($filename);
+                $encoded_filename = str_replace("+", "%20", $encoded_filename);
+	            // Set the output file
+                // If $outFile is set, the downloaded file will be written
+                // directly to disk rather than storing file data in memory
+                $outFile = false;
+                
+                $ua = $_SERVER["HTTP_USER_AGENT"];
+                
+                $encoded_filename = urlencode($filename);
+                $encoded_filename = str_replace("+", "%20", $encoded_filename);
+                
+                //header('Content-Type: '. $file['meta']->mime_type);
+                header('Content-Type: application/octet-stream');
+                
+                if (preg_match("/MSIE/", $ua)) {
+                	header('Content-Disposition: attachment; filename="' . $encoded_filename . '"');
+                } else if (preg_match("/Firefox/", $ua)) {
+                	header('Content-Disposition: attachment; filename*="utf8\'\'' . $filename . '"');
+                } else {
+                	header('Content-Disposition: attachment; filename="' . $filename . '"');
+                }
+
+                // Download the file
+                $file = $this -> getDropboxDisk()->getFile($file_path, $outFile);
+                echo $file['data'];
+
+	            break;
+	        default:
+	            break;
+	    }
 	}
 	   
 	/* 获取指定目录下的文件列表 */
@@ -160,10 +212,10 @@ class Service {
 				break;
 			case "dropbox":
                 // Require the bootstrap
-                require('Dropbox/bootstrap.php');
+                //require_once('Dropbox/bootstrap.php');
                 
                 // Get the metadata for the file/folder specified in $path
-                $fileList = $dropbox->metaData($dir == null ? "" : $dir);
+                $fileList = $this -> getDropboxDisk()->metaData($dir == null ? "" : $dir);
 				if($fileList["code"] == "200") {
 					$i = 0;
 					foreach ($fileList["body"] -> contents as $value){
@@ -182,9 +234,10 @@ class Service {
 						    $file -> fileSize = $value->size;
 						    $file -> fileBytes = $value->bytes; //获取文件字节数
 						    $file -> fileType = $value->mime_type;
-							//$file -> fileUrl = $singleFileInfo["body"]["s3_url"]; // 获取文件的下载地址
+							//$file -> fileUrl = "https://api-content.dropbox.com/1/files/dropbox".$path_in_dropbox; // 获取文件的下载地址
+							$file -> fileUrl = "/yun/fileDownload.php?drive=".$this->serviceId."&file_path=".$path_in_dropbox; // 获取文件的下载地址
 						} else { // 如果类型为空，代表是“文件夹”“目录”
-							$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$path_in_dropbox;//."&path=".$_REQUEST["path"]."/".$value["name"];
+							$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$path_in_dropbox;
 						}
 						
 						$result[$value->rev] = $file;

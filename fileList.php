@@ -25,7 +25,7 @@ $(document).ready(function() {
 			"aoColumns": [
 				{ "bSortable": false, "sWidth":"18px" },
 				null,
-				null,
+				// null,
 				{"sWidth":"60px", "sSortDataType":"dom-filebytes", "sType":"numeric"},
 				{"sWidth":"80px", "sType":"date"}
 			]
@@ -84,7 +84,7 @@ $(document).ready(function() {
 		<tr>
 			<th><input type="checkbox" id="fileListSelectAll" onclick="funFileListSelectAll(this);"></th>
 			<th>文件名</th>
-			<th>文件类型</th>
+			<!--<th>文件类型</th>-->
 			<th style="width:80px;">文件大小</th>
 			<th style="width:80px;">添加时间</th>
 		</tr>
@@ -98,7 +98,7 @@ $(document).ready(function() {
 			echo "        <input type=\"checkbox\" name=\"fileId\" value=\"".$aFile -> fileId."\" fileName=\"".$aFile -> fileName."\">\n";
 			echo "    </td>\n";
 			echo "    <td><a href=\"" . $aFile -> fileUrl . "\">" . $aFile -> fileName . "</a></td>\n";
-			echo "    <td>" . $aFile -> fileType . "</td>\n";
+			//echo "    <td>" . $aFile -> fileType . "</td>\n";
 			echo "    <td bytes=".$aFile -> fileBytes." style=\"text-align:right;\">" . $aFile -> fileSize . "<input type=hidden value=".$aFile -> fileBytes."></td>\n";
 			echo "    <td style=\"text-align:center;\">" . $aFile -> fileAddTime . "</td>\n";
 			echo "</tr>\n";

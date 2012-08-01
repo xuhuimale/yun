@@ -142,6 +142,7 @@ class vDisk
 				'password' => $password, 
 				'time' => $time,
 				'appkey' => $this->appkey,
+				'app_type' => $app_type,
 				'signature' => hash_hmac('sha256', "account={$username}&appkey={$this->appkey}&password={$password}&time={$time}", $this->appsecret, false)
 			);
 	
