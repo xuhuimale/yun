@@ -29,6 +29,7 @@ spl_autoload_register(function($class){
 // Set your consumer key, secret and callback URL
 $key      = 'y0alb7f14fs2c0r';
 $secret   = '96lsb548h92c12n';
+$root     = 'dropbox';
 
 // Check whether to use HTTPS and set the callback URL
 $protocol = (!empty($_SERVER['HTTPS'])) ? 'https' : 'http';
@@ -38,5 +39,5 @@ $callback = $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 $encrypter = new \Dropbox\OAuth\Storage\Encrypter('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 $storage = new \Dropbox\OAuth\Storage\Session($encrypter);
 $OAuth = new \Dropbox\OAuth\Consumer\Curl($key, $secret, $storage, $callback);
-$dropbox = new \Dropbox\API($OAuth, 'dropbox');
+$dropbox = new \Dropbox\API($OAuth, $root);
 ?>

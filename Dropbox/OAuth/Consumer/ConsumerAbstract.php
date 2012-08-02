@@ -80,12 +80,9 @@ abstract class ConsumerAbstract
 	{
 		// Only redirect if using CLI
 		if (PHP_SAPI !== 'cli'){
-		    //ob_start(); //打开缓冲区
 			$url = $this->getAuthoriseUrl();
-			//header('Location: ' . $url);
-			echo "<script> self.location(\"$url\");</script>";
-			//ob_end_flush();//输出全部内容到浏览器 
-			//exit;
+			header('Location: ' . $url);
+			exit;
 		}
 	}
 	
@@ -140,7 +137,7 @@ abstract class ConsumerAbstract
 				$token->oauth_token = null;
 				$token->oauth_token_secret = null;
 			}
-		}
+		}echo $token->oauth_token;
 		return $token;
 	}
 	

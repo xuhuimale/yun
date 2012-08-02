@@ -325,7 +325,7 @@ $(document).ready(function() {
 				 "dir":$("input[type='hidden'][id='dir']").val(),
 				 "create_name": input,
 				 "dir_parent_id":$("input[type='hidden'][id='dir']").val()};
-	
+	    //alert(jsonToString(param));
 		if(input != "") {
 			$.getJSON("/yun/createDir.php", param, function(error){
 				//alert(jsonToString(error));
