@@ -377,12 +377,29 @@ function deleteFile() {
 				 "dir":$("input[type='hidden'][id='dir']").val(),
 				 "fileIds":fileIds.join("~")};
 	
-	$.getJSON("/yun/fileDelete.php", param, function(arrayErrFileNames){
-		if(arrayErrFileNames != null && arrayErrFileNames.length > 0) {
-			alert("文件删除失败，请重新操作！\n" + arrayErrFileNames.join(", "));
-		}
-		window.location.reload();//href="/yun/frame.php?drive="+$("input[type='hidden'][id='serviceId']").val()+"&dir="+$("input[type='hidden'][id='dir']").val();
-	});
+//	$.getJSON("/yun/fileDelete.php", param, function(arrayErrFileNames){
+//		if(arrayErrFileNames != null && arrayErrFileNames.length > 0) {
+//			alert("文件删除失败，请重新操作！\n" + arrayErrFileNames.join(", "));
+//		}
+//		window.location.reload();//href="/yun/frame.php?drive="+$("input[type='hidden'][id='serviceId']").val()+"&dir="+$("input[type='hidden'][id='dir']").val();
+//	});
+	
+	$.ajax({
+        url: "/yun/fileDelete.php",
+        async: false,
+        dataType: "json",
+        data: param,
+        success: function(arrayErrFileNames){
+    		if(arrayErrFileNames != null && arrayErrFileNames.length > 0) {
+    			alert("文件删除失败，请重新操作！\n" + arrayErrFileNames.join(", "));
+    		}
+    		window.location.reload();//href="/yun/frame.php?drive="+$("input[type='hidden'][id='serviceId']").val()+"&dir="+$("input[type='hidden'][id='dir']").val();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("异常：\n" + XMLHttpRequest.responseText);
+            window.location.reload();
+        }
+    });
 
 }
 

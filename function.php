@@ -121,6 +121,29 @@ class Service {
 				$list = $this -> get_list($_REQUEST["dir"]);
 				$file = $list[$fileId];
 				break;
+			case "dropbox":
+                $file_meta = $this -> getDropboxDisk()->metaData($fileId);
+                $file_meta_body = $file_meta["body"];
+				if($file_meta["code"] == "200") {
+                    $path_in_dropbox = $file_meta_body->path;// Dropbox上获取到的完整路径
+                    $filename = substr(strrchr($path_in_dropbox, "/"), 1); // 通过路径截取出文件名
+					$file = new File();
+					$file -> fileId = $path_in_dropbox;
+					$file -> fileName = $filename;
+					//$file -> fileDirId = $value["dir_id"];
+					
+					if(!$file_meta_body->is_dir) { // 代表是一个文件
+					    $file -> fileAddTime = date("Y-m-d", strtotime($file_meta_body->modified));
+					    $file -> fileSize = $file_meta_body->size;
+					    $file -> fileBytes = $file_meta_body->bytes; //获取文件字节数
+					    $file -> fileType = $file_meta_body->mime_type;
+						//$file -> fileUrl = "https://api-content.dropbox.com/1/files/dropbox".$path_in_dropbox; // 获取文件的下载地址
+						$file -> fileUrl = "/yun/fileDownload.php?drive=".$this->serviceId."&file_path=".$path_in_dropbox; // 获取文件的下载地址
+					} else { // 如果类型为空，代表是“文件夹”“目录”
+						$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$path_in_dropbox;
+					}
+				}
+			    break;
 			default:
 				break;
 		}
@@ -224,7 +247,7 @@ class Service {
                         $path_in_dropbox = $value->path;// Dropbox上获取到的完整路径
                         $filename = substr(strrchr($path_in_dropbox, "/"), 1); // 通过路径截取出文件名
 						$file = new File();
-						$file -> fileId = $value->rev;
+						$file -> fileId = $path_in_dropbox;
 						$file -> fileName = $filename;
 						//$file -> fileDirId = $value["dir_id"];
 						
@@ -316,8 +339,6 @@ class Service {
 
 		switch($this -> serviceId) {
 			case "sina":
-
-				
 				$vdisk = $this -> getSinaVdisk();
 				
 				if($file->fileType != null || $file->fileType != "") { // 删除文件
@@ -327,6 +348,14 @@ class Service {
 				}
 			
 				break;
+			case "dropbox":
+			    $delete_result = $this -> getDropboxDisk() -> delete($file->fileId);
+			    if($delete_result["code"] == "200") {
+			        $result = array("err_code" => 0, "err_msg" => "success");
+			    }else {
+			        $result = array("err_code" => -1, "err_msg" => $delete_result["body"]->error);
+			    }
+			    break;
 			default:
 				break;
 		}

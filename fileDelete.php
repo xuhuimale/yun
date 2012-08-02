@@ -1,9 +1,8 @@
 <?php
-
 	require("./function.php"); 
 	$fileIds = $_REQUEST["fileIds"];
 	$fileIdArray = explode("~", $fileIds);
-	// $result = array();
+	$result = "";
 	$i = 0;
 	foreach($fileIdArray as $oneFileId) {
 		$file = $aService -> get_file_info($oneFileId);
@@ -12,8 +11,6 @@
 			$result[$i++] = $file -> fileName;
 		}
 	}
-	
-	//$result = array("err_msg" => "测试信息");
 	
 	echo json_encode($result);
 ?>
