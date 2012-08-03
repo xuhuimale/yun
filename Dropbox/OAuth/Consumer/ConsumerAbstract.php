@@ -137,7 +137,7 @@ abstract class ConsumerAbstract
 				$token->oauth_token = null;
 				$token->oauth_token_secret = null;
 			}
-		}echo $token->oauth_token;
+		}
 		return $token;
 	}
 	

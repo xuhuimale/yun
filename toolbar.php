@@ -327,14 +327,33 @@ $(document).ready(function() {
 				 "dir_parent_id":$("input[type='hidden'][id='dir']").val()};
 	    //alert(jsonToString(param));
 		if(input != "") {
-			$.getJSON("/yun/createDir.php", param, function(error){
-				//alert(jsonToString(error));
-				if(error.err_code != 0) {
-					alert("新建时出错了，请尝试更换文件夹名称！\n" + error.err_msg);
-				} else {
-					window.location.reload();
-				}
-			});
+//			$.getJSON("/yun/createDir.php", param, function(error){
+//				//alert(jsonToString(error));
+//				if(error.err_code != 0) {
+//					alert("新建时出错了，请尝试更换文件夹名称！\n" + error.err_msg);
+//				} else {
+//					window.location.reload();
+//				}
+//			});
+				
+        	$.ajax({
+                url: "/yun/createDir.php",
+                async: false,
+                dataType: "json",
+                data: param,
+                success: function(error){
+    				//alert(jsonToString(error));
+    				if(error.err_code != 0) {
+    					alert("新建时出错了，请尝试更换文件夹名称！\n" + error.err_msg);
+    				} else {
+    					window.location.reload();
+    				}
+				},
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("异常：\n" + XMLHttpRequest.responseText);
+                    window.location.reload();
+                }
+            });
 		}
 		// do not submit the form
 		return e.preventDefault();

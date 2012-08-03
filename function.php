@@ -379,12 +379,12 @@ class Service {
 				$result = $vdisk->create_dir($create_name, $parent_dir_id);
 				break;
 			case "dropbox":
-			    $file_dropbox_path = $parent_dir_id.$create_name;
+			    $file_dropbox_path = $parent_dir_id."/".$create_name;
 			    $create_dir_result = $this -> getDropboxDisk() -> create($file_dropbox_path);
 			    if($create_dir_result["code"] == "200") {
 			        $result = array("err_code" => 0, "err_msg" => "success");
 			    }else {
-			        $result = array("err_code" => -1, "err_msg" => $delete_result["body"]->error);
+			        $result = array("err_code" => -1, "err_msg" => $create_dir_result["body"]->error);
 			    }
 			    break;
 			default:
