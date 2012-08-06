@@ -87,7 +87,8 @@ abstract class ConsumerAbstract
 		// Only redirect if using CLI
 		if (PHP_SAPI !== 'cli'){
 			$url = $this->getAuthoriseUrl();
-			header('Location: ' . $url);
+			echo "<script>self.location.href=(\"".$url."\");</script>";
+			// header('Location: ' . $url);
 			exit;
 		}
 	}

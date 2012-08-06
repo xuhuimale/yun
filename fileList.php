@@ -97,7 +97,7 @@ $(document).ready(function() {
 			echo "    <td style=\"text-align:center;\">\n";
 			echo "        <input type=\"checkbox\" name=\"fileId\" value=\"".$aFile -> fileId."\" fileName=\"".$aFile -> fileName."\">\n";
 			echo "    </td>\n";
-			echo "    <td><a href=\"" . $aFile -> fileUrl . "\">" . $aFile -> fileName . "</a></td>\n";
+			echo "    <td><a target=\"_blank\" href=\"" . $aFile -> fileUrl . "\">" . $aFile -> fileName . "</a></td>\n";
 			//echo "    <td>" . $aFile -> fileType . "</td>\n";
 			echo "    <td bytes=".$aFile -> fileBytes." style=\"text-align:right;\">" . $aFile -> fileSize . "<input type=hidden value=".$aFile -> fileBytes."></td>\n";
 			echo "    <td style=\"text-align:center;\">" . $aFile -> fileAddTime . "</td>\n";
