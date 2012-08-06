@@ -9,6 +9,7 @@
 
 <?php 
 	$r = $aService->get_quota(); 
+	//var_dump($r);
 	if($r['total'] != 0) {
 		$toolbarUseRate = sprintf("%6.2f", $r['used']/$r['total']*100); 
 	} else {
