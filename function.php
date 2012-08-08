@@ -89,13 +89,34 @@ class Service {
 		
 		return $dropbox;
     }
-    
+
 	/**
 	  *金山快盘 对象
 	  */
     private function getKingsoftDisk() {
-		require('kingsoft/config.inc.php');
+		require_once('kuaipan/sdk/kuaipan.class.php');
+		$config = require_once('kuaipan/config.inc.php');
+
+		$kp = new Kuaipan ( $config ['consumer_key'], $config ['consumer_secret'] );
+
+		$oauth_token = isset ( $_REQUEST ['oauth_token'] ) ? $_REQUEST ['oauth_token'] : '';
+		$oauth_verifier = isset ( $_REQUEST ['oauth_verifier'] ) ? $_REQUEST ['oauth_verifier'] : '';
+		$_SESSION["oauth_token"] = $oauth_token;
+		$_SESSION["oauth_verifier"] = $oauth_verifier;
+
+		$token = $kp->getAccessToken($_SESSION["oauth_token"], $_SESSION["oauth_verifier"]);
 		
+		// var_dump($token);
+        if (empty ( $token ['oauth_token'] ) || empty ( $token ['oauth_token_secret'] )) {
+			$authorization_uri = $kp->getAuthorizationUri ( $config ['cb_uri'] );
+			if (false === $authorization_uri) {
+			    echo 'request token error' . '<br />';
+			    echo nl2br ( var_export ( $kp->getError () ) );
+			    exit ();
+			} else {
+			    header ( 'Location:' . $authorization_uri );
+			}
+        }
 		return $kp;
     }
 	
@@ -111,7 +132,6 @@ class Service {
 				//print_r($r);
 				$result["used"] = $r['data']['used'];
 				$result["total"] = $r['data']['total'];
-				return $result;
 				break;
 			case "dropbox":
     			// Require the bootstrap
@@ -122,16 +142,20 @@ class Service {
                 
 				$result["used"] = $accountInfo['body']->quota_info->normal;
 				$result["total"] = $accountInfo['body']->quota_info->quota;
-				return $result;
 				break;
 			case "kingsoft":
-			    $ret = $this -> getKingsoftDisk()->api ( 'account_info' );
-				//var_dump($ret);
-				return $ret;
+				$kp = $this -> getKingsoftDisk();
+			    $accountInfo = $kp->api ( 'account_info' );
+			    if (false === $accountInfo) {
+			        $accountInfo = $kp->getError ();
+			    }    
+				$result["used"] = $accountInfo['quota_used'];
+				$result["total"] = $accountInfo['quota_total'];
 			    break;
 			default :
 			    break;
 		}
+		return $result;
 	}
 	
 	/* 通过文件编号获取文件信息 */
@@ -298,7 +322,57 @@ class Service {
 					}
 					//print_r($result);
 				} else {
-				    
+					// 
+					 "错误".$r["err_msg"];
+					$result = null;
+				}
+				break;
+			case 'kingsoft':
+    			$root_path = 'kuaipan'; // 应用拥有整个快盘的权限，否则可以使用ap_folder
+	            
+                // Get the metadata for the file/folder specified in $path
+                $kp = $this -> getKingsoftDisk();
+				try {
+				    $ret = $kp->api ( 'metadata', $root_path, $params );
+				    if (false === $ret) {
+				        $ret = $kp->getError ();
+				    }
+				} catch ( Exception $e ) {
+				    error_log ( $e->getMessage () );
+				    $ret = array (
+				            'exception' => $e->getMessage ()
+				    );
+				}
+				var_dump($ret);
+
+
+                exit();
+				if($fileList["code"] == "200") {
+					$i = 0;
+					foreach ($fileList["body"] -> contents as $value){
+                        //var_dump($value);
+                        
+                        $path_in_dropbox = $value->path;// Dropbox上获取到的完整路径
+                        $filename = substr(strrchr($path_in_dropbox, "/"), 1); // 通过路径截取出文件名
+						$file = new File();
+						$file -> fileId = $path_in_dropbox;
+						$file -> fileName = $filename;
+						//$file -> fileDirId = $value["dir_id"];
+						
+						if(!$value->is_dir) { // 代表是一个文件
+						    $file -> fileAddTime = date("Y-m-d", strtotime($value->modified));
+						    $file -> fileSize = $value->size;
+						    $file -> fileBytes = $value->bytes; //获取文件字节数
+						    $file -> fileType = $value->mime_type;
+						    $file -> fileUrl = "/yun/fileDownload.php?drive=".$this->serviceId."&file_path=".$path_in_dropbox; // 获取文件的下载地址
+						} else { // 如果类型为空，代表是“文件夹”“目录”
+							$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$path_in_dropbox;
+						}
+						
+						$result[$value->rev] = $file;
+					}
+					//print_r($result);
+				} else {
 					// 
 					 "错误".$r["err_msg"];
 					$result = null;

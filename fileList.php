@@ -15,7 +15,7 @@ $(document).ready(function() {
 	if($("#serviceId").val() != "") {
 		$('#fileTable').show();
 
-        /* 画表格方法 */
+        /* 画表格方法 
 		var oTable = $('#fileTable').dataTable({
 			"aaSorting": [],
 			//"bSort": false,
@@ -29,7 +29,7 @@ $(document).ready(function() {
 				{"sWidth":"60px", "sSortDataType":"dom-filebytes", "sType":"numeric"},
 				{"sWidth":"80px", "sType":"date"}
 			]
-		});
+		});*/
 		/* 固定表格头的位置 */
 		new FixedHeader( oTable, {
 			offsetTop:180
