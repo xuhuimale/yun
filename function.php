@@ -95,7 +95,7 @@ class Service {
 	  */
     private function getKingsoftDisk() {
 		require_once('kuaipan/sdk/kuaipan.class.php');
-		$config = require_once('kuaipan/config.inc.php');
+		$config = require('kuaipan/config.inc.php');
 
 		$kp = new Kuaipan ( $config ['consumer_key'], $config ['consumer_secret'] );
 
@@ -266,13 +266,13 @@ class Service {
 						$file = new File();
 						$file -> fileId = $value["id"];
 						$file -> fileName = $value["name"];
-						$file -> fileSize = $value["size"];
 						$file -> fileType = $value["type"];
 						$file -> fileAddTime = date("Y-m-d", $value["ctime"]);
 						$file -> fileDirId = $value["dir_id"];
-						$file -> fileBytes = $value["length"]; //获取文件字节数
 						
 						if($value["type"] != "") { // 如果类型不为空，代表是一个文件
+							$file -> fileSize = $value["size"];
+							$file -> fileBytes = $value["length"]; //获取文件字节数
 							//$singleFileInfo = $vdisk->get_file_info($value["id"]); // 获取单个文件详细信息
 							$file -> fileUrl = "/yun/fileDownload.php?drive=".$this->serviceId."&fileId=".$value["id"]; // 获取文件的下载地址
 
@@ -307,9 +307,9 @@ class Service {
 						$file -> fileId = $path_in_dropbox;
 						$file -> fileName = $filename;
 						//$file -> fileDirId = $value["dir_id"];
+						$file -> fileAddTime = date("Y-m-d", strtotime($value->modified));
 						
 						if(!$value->is_dir) { // 代表是一个文件
-						    $file -> fileAddTime = date("Y-m-d", strtotime($value->modified));
 						    $file -> fileSize = $value->size;
 						    $file -> fileBytes = $value->bytes; //获取文件字节数
 						    $file -> fileType = $value->mime_type;
@@ -322,8 +322,7 @@ class Service {
 					}
 					//print_r($result);
 				} else {
-					// 
-					 "错误".$r["err_msg"];
+					// echo "错误".$r["err_msg"];
 					$result = null;
 				}
 				break;
@@ -333,48 +332,52 @@ class Service {
                 // Get the metadata for the file/folder specified in $path
                 $kp = $this -> getKingsoftDisk();
 				try {
-				    $ret = $kp->api ( 'metadata', $root_path, $params );
-				    if (false === $ret) {
-				        $ret = $kp->getError ();
+					//echo "string=".$root_path.urlencode(substr($dir, 1));
+					//$params = array('path' => $dir == null ? "" : $dir);
+				    $fileList = $kp->api ( 'metadata', $root_path.urlencode(substr($dir, 1)));
+				    if (false === $fileList) {
+				        $fileList = $kp->getError ();
+				        var_dump($fileList);
 				    }
 				} catch ( Exception $e ) {
 				    error_log ( $e->getMessage () );
-				    $ret = array (
+				    $fileList = array (
 				            'exception' => $e->getMessage ()
 				    );
 				}
-				var_dump($ret);
+				var_dump($fileList);
 
-
-                exit();
-				if($fileList["code"] == "200") {
+				if(false != $fileList) {
 					$i = 0;
-					foreach ($fileList["body"] -> contents as $value){
+					foreach ($fileList["files"] as $value){
                         //var_dump($value);
                         
-                        $path_in_dropbox = $value->path;// Dropbox上获取到的完整路径
-                        $filename = substr(strrchr($path_in_dropbox, "/"), 1); // 通过路径截取出文件名
 						$file = new File();
-						$file -> fileId = $path_in_dropbox;
-						$file -> fileName = $filename;
+						$file -> fileId = $value['file_id'];
+						if($fileList['path'] == "/") {
+							$file -> filePath = "/".$value['name'];
+						}else {
+							$file -> filePath = $fileList['path']."/".$value['name'];
+						}
+						$file -> fileName = $value['name'];
 						//$file -> fileDirId = $value["dir_id"];
+						$file -> fileAddTime = date("Y-m-d", strtotime($value['create_time']));
 						
-						if(!$value->is_dir) { // 代表是一个文件
-						    $file -> fileAddTime = date("Y-m-d", strtotime($value->modified));
-						    $file -> fileSize = $value->size;
-						    $file -> fileBytes = $value->bytes; //获取文件字节数
-						    $file -> fileType = $value->mime_type;
-						    $file -> fileUrl = "/yun/fileDownload.php?drive=".$this->serviceId."&file_path=".$path_in_dropbox; // 获取文件的下载地址
+						if("file" == $value['type']) { // 代表是一个文件
+						    $file -> fileSize = $value['size'];
+						    $file -> fileBytes = $value['size']; //获取文件字节数
+						    $file -> fileType = $value['type'];
+						    $file -> fileUrl = "/yun/fileDownload.php?drive=".$this->serviceId."&file_path=".$file -> filePath; // 获取文件的下载地址
 						} else { // 如果类型为空，代表是“文件夹”“目录”
-							$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$path_in_dropbox;
+							$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".urlencode($file -> filePath);
 						}
 						
-						$result[$value->rev] = $file;
+						$result[$value['file_id']] = $file;
 					}
-					//print_r($result);
+					//var_dump($result);
+					//exit();
 				} else {
-					// 
-					 "错误".$r["err_msg"];
+					// echo "错误".$r["err_msg"];
 					$result = null;
 				}
 				break;
@@ -414,6 +417,25 @@ class Service {
 				break;
 				
 			case "dropbox":
+				$_path = substr($dir, 1);
+				if(strlen($_path) > 1) {
+					$dirNameArray = explode("/", $_path);
+				}
+				// print_r($dirNameArray);
+				
+				for ($i = 0; $i < count($dirNameArray); $i++) {
+					$file = new File();
+					$file -> fileName = $dirNameArray[$i];
+					
+					// 路径全名
+					$curFullPath = "/".join("/", array_slice($dirNameArray, 0, $i+1));
+					//echo $theDirInfo["err_msg"];
+					$file -> fileUrl = "/yun/frame.php?drive=".$this->serviceId."&dir=".$curFullPath;
+					$dirStruct[$i] = $file;
+				}				
+			
+			    break;
+			case "kingsoft":
 				$_path = substr($dir, 1);
 				if(strlen($_path) > 1) {
 					$dirNameArray = explode("/", $_path);

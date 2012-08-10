@@ -15,7 +15,7 @@ $(document).ready(function() {
 	if($("#serviceId").val() != "") {
 		$('#fileTable').show();
 
-        /* 画表格方法 
+        /* 画表格方法 */
 		var oTable = $('#fileTable').dataTable({
 			"aaSorting": [],
 			//"bSort": false,
@@ -29,7 +29,7 @@ $(document).ready(function() {
 				{"sWidth":"60px", "sSortDataType":"dom-filebytes", "sType":"numeric"},
 				{"sWidth":"80px", "sType":"date"}
 			]
-		});*/
+		});
 		/* 固定表格头的位置 */
 		new FixedHeader( oTable, {
 			offsetTop:180
@@ -93,11 +93,15 @@ $(document).ready(function() {
 		<?php 
 		$fileListTable = $aService -> get_list($dir); 
 		foreach ($fileListTable as $aFile) {
+			$target = "_self"; // 当前窗口打开还是新窗口打开
+			if(!empty($aFile -> fileSize)) { // 文件夹目录链接在当前窗口打开；文件链接在新窗口打开
+				$target = "_blank";
+			}
 			echo "<tr>\n";
 			echo "    <td style=\"text-align:center;\">\n";
 			echo "        <input type=\"checkbox\" name=\"fileId\" value=\"".$aFile -> fileId."\" fileName=\"".$aFile -> fileName."\">\n";
 			echo "    </td>\n";
-			echo "    <td><a target=\"_blank\" href=\"" . $aFile -> fileUrl . "\">" . $aFile -> fileName . "</a></td>\n";
+			echo "    <td><a target=\"". $target ."\" href=\"" . $aFile -> fileUrl . "\">" . $aFile -> fileName . "</a></td>\n";
 			//echo "    <td>" . $aFile -> fileType . "</td>\n";
 			echo "    <td bytes=".$aFile -> fileBytes." style=\"text-align:right;\">" . $aFile -> fileSize . "<input type=hidden value=".$aFile -> fileBytes."></td>\n";
 			echo "    <td style=\"text-align:center;\">" . $aFile -> fileAddTime . "</td>\n";

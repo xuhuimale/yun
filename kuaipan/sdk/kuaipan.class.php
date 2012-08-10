@@ -164,7 +164,7 @@ class Kuaipan {
         }
         $full_uri = $this->finalUri($api_uri, $params, $http_method, $_SESSION[self::SKEY_ACCESS_SECRET]);
         // $uri, $http_method = 'GET', $file_path = '', $header = array ()
-        echo "$full_uri";
+        //echo "$full_uri";
         $response = $this->request ( $full_uri, $http_method, $file_path );
         if (false !== $response) {
             if ($this->format == 'array') {
