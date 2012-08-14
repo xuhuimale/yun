@@ -99,15 +99,25 @@ class Service {
 
 		$kp = new Kuaipan ( $config ['consumer_key'], $config ['consumer_secret'] );
 
-		$oauth_token = isset ( $_REQUEST ['oauth_token'] ) ? $_REQUEST ['oauth_token'] : '';
-		$oauth_verifier = isset ( $_REQUEST ['oauth_verifier'] ) ? $_REQUEST ['oauth_verifier'] : '';
+		$oauth_token = isset($_SESSION["oauth_token"]) ? $_SESSION["oauth_token"] : 
+							( isset ( $_REQUEST ['oauth_token'] ) ? $_REQUEST ['oauth_token'] : '') ;
+															
+		$oauth_verifier = isset($_SESSION["oauth_verifier"]) ? $_SESSION["oauth_verifier"] : 
+							( isset ( $_REQUEST ['oauth_verifier'] ) ? $_REQUEST ['oauth_verifier'] : '');
+															
 		$_SESSION["oauth_token"] = $oauth_token;
 		$_SESSION["oauth_verifier"] = $oauth_verifier;
 
+//		echo "oauth_token=$oauth_token <br>";
+//		echo "oauth_verifier=$oauth_verifier <br>";
+//		echo "_SESSION[\"oauth_token\"]=".($_SESSION["oauth_token"])."<br>";
+//		echo "_SESSION[\"oauth_verifier\"]={$_SESSION["oauth_verifier"]}<br>";
 		$token = $kp->getAccessToken($_SESSION["oauth_token"], $_SESSION["oauth_verifier"]);
 		
-		// var_dump($token);
+//		var_dump($token);
         if (empty ( $token ['oauth_token'] ) || empty ( $token ['oauth_token_secret'] )) {
+			unset($_SESSION["oauth_token"]);
+			unset($_SESSION["oauth_verifier"]);
 			$authorization_uri = $kp->getAuthorizationUri ( $config ['cb_uri'] );
 			if (false === $authorization_uri) {
 			    echo 'request token error' . '<br />';
@@ -118,6 +128,7 @@ class Service {
 			}
         }
 		return $kp;
+
     }
 	
 	/* 获取网盘的容量信息 */
@@ -335,9 +346,11 @@ class Service {
 					//echo "string=".$root_path.urlencode(substr($dir, 1));
 					//$params = array('path' => $dir == null ? "" : $dir);
 				    $fileList = $kp->api ( 'metadata', $root_path.urlencode(substr($dir, 1)));
-				    if (false === $fileList) {
+				    if (false === $fileList || isset($fileList['http_code'])) {
 				        $fileList = $kp->getError ();
 				        var_dump($fileList);
+				        echo "<script>alert(\"错误编码：".$fileList['http_code']."\");</script>";
+				        exit();
 				    }
 				} catch ( Exception $e ) {
 				    error_log ( $e->getMessage () );
@@ -345,9 +358,9 @@ class Service {
 				            'exception' => $e->getMessage ()
 				    );
 				}
-				var_dump($fileList);
+				// var_dump($fileList);
 
-				if(false != $fileList) {
+				if(false != $fileList && !isset($fileList['http_code']) ) {
 					$i = 0;
 					foreach ($fileList["files"] as $value){
                         //var_dump($value);
