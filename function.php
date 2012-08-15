@@ -24,7 +24,116 @@ class Service {
 	var $dir;         //当前所在的文件夹地址
 	var $uploadLimit; //上传的文件大小限制，单位：Bytes
 	
-//	private $vdisk; // 新浪微盘
+
+
+    /**
+     * Default options for curl.
+     */
+    protected $default_curl_opts = array (
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:10.0.2) Gecko/20100101 Firefox/10.0.2',
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_AUTOREFERER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+    );
+
+    /**
+     * 使用curl发送request
+     * @param string $uri
+     * @param string $http_method
+     * @param string $file_path  如果需要发送文件，这个参数是文件地址
+     * @param string $header  额外的头信息
+     * @throws Exception
+     */
+    protected function request($uri, $http_method = 'GET', $file_path = '', $header = array ()) {
+        //init
+        $uri_parts = parse_url ( $uri );
+        $has_content_type = $has_cache_control = $has_connection = $has_keep_alive = false;
+        if (!empty($header)) {
+            foreach ( $header as $h ) {
+                if (strncasecmp ( $h, 'Content-Type:', 13 ) == 0) {
+                    $has_content_type = true;
+                }
+                if (strncasecmp ( $h, 'Cache-Control:', 14 ) == 0) {
+                    $has_cache_control = true;
+                }
+                if (strncasecmp ( $h, 'Connection:', 11 ) == 0) {
+                    $has_connection = true;
+                }
+                if (strncasecmp ( $h, 'Keep-Alive:', 11 ) == 0) {
+                    $has_keep_alive = true;
+                }
+            }
+        }
+        ! $has_cache_control && $header [] = "Cache-Control: no-cache";
+        ! $has_connection && $header [] = "Connection: keep-alive";
+        ! $has_keep_alive && $header [] = "Keep-Alive: 300";
+        
+        $ch = curl_init ($uri);
+        $curl_opts = $this->default_curl_opts;
+        if (! empty ( $file_path )) {
+            if (preg_match ( '/[^a-z0-9\-_.]/i', basename($file_path) )) {
+                throw new Exception ( sprintf ( 'Security check: Illegal character in filename "%s".', $file_path ) );
+            }
+            if ($http_method == 'POST') {//upload file
+                //check file
+                if (! file_exists ( $file_path )) {
+                    throw new Exception ( sprintf ( 'File not exists: "%s".', $file_path ) );
+                }
+                if (! filesize ( $file_path )) {
+                    throw new Exception ( sprintf ( 'File size read error: "%s".', $file_path ) );
+                }
+                $curl_opts [CURLOPT_POST] = true;
+                $curl_opts [CURLOPT_POSTFIELDS] = array ('file' => '@' . $file_path);
+            } else { // download file
+                // set cookies path
+                $cookie_file = tempnam ( sys_get_temp_dir (), 'kp_phpsdk_cookie_' );
+                $curl_opts [CURLOPT_COOKIEFILE] = $cookie_file;
+                $curl_opts [CURLOPT_COOKIEJAR] = $cookie_file;
+                //resource handle for save  file
+                $fp = fopen ( $file_path, 'wb' );
+                $curl_opts [CURLOPT_FILE] = $fp;
+            }
+        } else {
+            // a 'normal' request, no body to be send
+            if ($http_method == 'POST') {
+                if (! $has_content_type) {
+                    $header [] = 'Content-Type: application/x-www-form-urlencoded';
+                    $has_content_type = true;
+                }
+                $curl_opts [CURLOPT_POST] = true;
+                !empty($uri_parts['query']) && $curl_opts [CURLOPT_POSTFIELDS] = $uri_parts['query'];
+            }
+        }
+        //set headers
+        $curl_opts[CURLOPT_HTTPHEADER] = $header;
+        curl_setopt_array ( $ch, $curl_opts );
+        $response = curl_exec ( $ch );
+        if ($response === false) {
+            $error = curl_error ( $ch );
+            curl_close ( $ch );
+            isset($fp) && fclose($fp);
+            throw new Exception ( 'CURL error: ' . $error );
+        }
+        unset ( $header, $uri, $http_method, $uri_parts, $file_path );
+        if (! empty ( $response )) {
+            $code = curl_getinfo ( $ch, CURLINFO_HTTP_CODE );
+            if ($code != 200) {
+                $ret = false;
+            } else { // parse result
+                $ret = $response;
+            }
+        }
+        curl_close ( $ch );
+        isset($fp) && fclose($fp);
+        return $ret;
+    }
+
 	
 	/* 构造函数 */
 	function __construct($serviceId, $dir) {
@@ -55,6 +164,14 @@ class Service {
 				$this -> serviceName = "金山快盘";
 				$this -> homepage = "http://www.kuaipan.cn/";
 				$this -> logoUrl = "./image/logo/klive.ico";
+				$this -> dir = $dir;
+				
+			    break;
+			case "baidu":
+				$this -> serviceId = "baidu";
+				$this -> serviceName = "百度网盘";
+				$this -> homepage = "http://pan.baidu.com/infocenter/login";
+				$this -> logoUrl = "./image/logo/baidu-logo.ico";
 				$this -> dir = $dir;
 				
 			    break;
@@ -99,25 +216,25 @@ class Service {
 
 		$kp = new Kuaipan ( $config ['consumer_key'], $config ['consumer_secret'] );
 
-		$oauth_token = isset($_SESSION["oauth_token"]) ? $_SESSION["oauth_token"] : 
+		$oauth_token = isset($_SESSION[Kuaipan::SKEY_ACCESS_TOKEN]) ? $_SESSION[Kuaipan::SKEY_ACCESS_TOKEN] : 
 							( isset ( $_REQUEST ['oauth_token'] ) ? $_REQUEST ['oauth_token'] : '') ;
 															
-		$oauth_verifier = isset($_SESSION["oauth_verifier"]) ? $_SESSION["oauth_verifier"] : 
+		$oauth_verifier = isset($_SESSION[Kuaipan::SKEY_ACCESS_SECRET]) ? $_SESSION[Kuaipan::SKEY_ACCESS_SECRET] : 
 							( isset ( $_REQUEST ['oauth_verifier'] ) ? $_REQUEST ['oauth_verifier'] : '');
 															
-		$_SESSION["oauth_token"] = $oauth_token;
-		$_SESSION["oauth_verifier"] = $oauth_verifier;
+		$_SESSION[Kuaipan::SKEY_ACCESS_TOKEN] = $oauth_token;
+		$_SESSION[Kuaipan::SKEY_ACCESS_SECRET] = $oauth_verifier;
 
 //		echo "oauth_token=$oauth_token <br>";
 //		echo "oauth_verifier=$oauth_verifier <br>";
-//		echo "_SESSION[\"oauth_token\"]=".($_SESSION["oauth_token"])."<br>";
-//		echo "_SESSION[\"oauth_verifier\"]={$_SESSION["oauth_verifier"]}<br>";
-		$token = $kp->getAccessToken($_SESSION["oauth_token"], $_SESSION["oauth_verifier"]);
+//		echo "_SESSION[\"oauth_token\"]=".($_SESSION[Kuaipan::SKEY_ACCESS_TOKEN])."<br>";
+//		echo "_SESSION[\"oauth_verifier\"]={$_SESSION[Kuaipan::SKEY_ACCESS_SECRET]}<br>";
+		$token = $kp->getAccessToken($_SESSION[Kuaipan::SKEY_ACCESS_TOKEN], $_SESSION[Kuaipan::SKEY_ACCESS_SECRET]);
 		
 //		var_dump($token);
         if (empty ( $token ['oauth_token'] ) || empty ( $token ['oauth_token_secret'] )) {
-			unset($_SESSION["oauth_token"]);
-			unset($_SESSION["oauth_verifier"]);
+			unset($_SESSION[Kuaipan::SKEY_ACCESS_TOKEN]);
+			unset($_SESSION[Kuaipan::SKEY_ACCESS_SECRET]);
 			$authorization_uri = $kp->getAuthorizationUri ( $config ['cb_uri'] );
 			if (false === $authorization_uri) {
 			    echo 'request token error' . '<br />';
@@ -131,6 +248,66 @@ class Service {
 
     }
 	
+	/**
+	  *百度网盘 对象
+	  */
+    private function getBaiduDisk() {
+		require_once('pcs-php-sdk/pcs.class.php');
+
+        $client_id  = '1WNHyD1cHLQUSFsOrXoYHmfo';
+        $api_key    = '1WNHyD1cHLQUSFsOrXoYHmfo';
+        $secret_key = 'Iybhit229Hn9FAE9N9XMhPNx9mniUDxA';
+
+        // Check whether to use HTTPS and set the callback URL
+        $protocol = (!empty($_SERVER['HTTPS'])) ? 'https' : 'http';
+        $callback = $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+        $access_token_code = "pcs_access_token";
+
+        $ret = false;
+            unset($_SESSION[$access_token_code]); // 先清空一下access_code
+        echo "_SESSION[$access_token_code]".$_SESSION[$access_token_code];
+        echo "\n";
+        if (isset($_SESSION[$access_token_code])) { // 如果session中有acces_token，已经授权登陆成功，直接返回即可
+            $ret = array (
+                    'oauth_token' => $_SESSION [$access_token_code]
+            );
+        }elseif (isset($_REQUEST['code'])) { // 能在request中获取code，是authorize_code，然后获取access_code
+            unset($_SESSION[$access_token_code]); // 先清空一下access_code
+            echo "string";
+            $uri = "https://openapi.baidu.com/oauth/2.0/token?grant_type=authorization_code&code=".$_REQUEST['code'].
+                    "&client_id=".$client_id.
+                    "&client_secret=".$secret_key.
+                    "&scope=netdisk".
+                    "&redirect_uri=".$callback;
+            $response = $this->request ( $uri );
+            if ($response != false) {
+                $token = json_decode ( $response, true );
+                var_dump($token);
+                $_SESSION[$access_token_code] = $token['access_token'];
+            }
+        }else {
+            header("Location:"."https://openapi.baidu.com/oauth/2.0/authorize?response_type=code&".
+            						"client_id=".$client_id.
+                    				"&scope=netdisk".
+            						"&redirect_uri=".($callback));
+            exit();
+        }
+
+        $access_token = $_SESSION[$access_token_code];
+		//echo "access_token=$access_token";
+		/* 只需修改这两个参数即可 */
+		$auth = array (
+			'access_token' => $access_token,
+		);	
+		$app = 'pcstest_oauth';
+
+		$pcs = new BaiduPCS($auth);
+		$pcs->set_ssl(true);
+		//var_dump($pcs);
+		return $pcs;
+
+    }
 	/* 获取网盘的容量信息 */
 	function get_quota() {
 		$result = array();
@@ -163,6 +340,16 @@ class Service {
 				$result["used"] = $accountInfo['quota_used'];
 				$result["total"] = $accountInfo['quota_total'];
 			    break;
+			case 'baidu':
+				/* 查询配额空间和已使用空间 */
+				$pcs = $this -> getBaiduDisk();
+				if (!($data = $pcs->info_quota())) {
+					var_dump($pcs);
+					return;
+				} else {
+				    echo json_encode($data);
+				}
+				break;
 			default :
 			    break;
 		}

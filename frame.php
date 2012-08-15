@@ -33,10 +33,10 @@
 			<li><a href="/yun/frame.php?drive=dropbox">dropbox</a></li>
 			<li><a href="/yun/frame.php?drive=sina">SINA微盘</a></li>
 			<li><a href="/yun/frame.php?drive=kingsoft">金山网盘</a></li>
+			<li><a href="/yun/frame.php?drive=baidu">百度网盘（api未完全开放）</a></li>
 		</ul>
 		<ul id="unused">
 			<li><a href="javascript:alert('待添加');">阿里云</a></li>
-			<li><a href="javascript:alert('待添加');">百度网盘</a></li>
 			<li><a href="javascript:alert('待添加');">MicroSoft Skydrive</a></li>
 			<li><a href="javascript:alert('待添加');">Google Drive</a></li>
 			<li><a href="javascript:alert('待添加');">Amazon Cloud Drive</a></li>
