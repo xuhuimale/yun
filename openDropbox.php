@@ -1,6 +1,28 @@
 <?php
 
-unset($_SESSION);
+$a = array('a','b');
+$b = array('c', 'd');
+$c = $a + $b;
+var_dump($a);
+var_dump(array_merge($a, $b));
+
+$a = array(0 => 'a', 1 => 'b');
+$b = array(0 => 'c', 1 => 'b');
+$c = $a + $b;
+var_dump($c);
+var_dump(array_merge($a, $b));
+
+$a = array('a', 'b');
+$b = array('0' => 'c', 1 => 'b');
+$c = $a + $b;
+var_dump($c);
+var_dump(array_merge($a, $b));
+
+$a = array('aa0' => 'a', 'bb1' => 'b');
+$b = array('00' => 'c', '1111' => 'b');
+$c = $a + $b;
+var_dump($c);
+var_dump(array_merge($a, $b));
 
 //// Require the bootstrap
 //require_once('Dropbox/bootstrap.php');

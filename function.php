@@ -50,7 +50,7 @@ class Service {
      * @param string $header  额外的头信息
      * @throws Exception
      */
-    protected function request($uri, $http_method = 'GET', $file_path = '', $header = array ()) {
+    protected function request($uri, $http_method = 'GET', $file_path = '', $header = array (), $params = array()) {
         //init
         $uri_parts = parse_url ( $uri );
         $has_content_type = $has_cache_control = $has_connection = $has_keep_alive = false;
@@ -112,8 +112,10 @@ class Service {
         }
         //set headers
         $curl_opts[CURLOPT_HTTPHEADER] = $header;
+
         curl_setopt_array ( $ch, $curl_opts );
         $response = curl_exec ( $ch );
+
         if ($response === false) {
             $error = curl_error ( $ch );
             curl_close ( $ch );
@@ -172,6 +174,14 @@ class Service {
 				$this -> serviceName = "百度网盘";
 				$this -> homepage = "http://pan.baidu.com/infocenter/login";
 				$this -> logoUrl = "./image/logo/baidu-logo.ico";
+				$this -> dir = $dir;
+				
+			    break;
+			case "microsoft":
+				$this -> serviceId = "microsoft";
+				$this -> serviceName = "Microsoft Skydriver";
+				$this -> homepage = "https://skydrive.live.com/";
+				$this -> logoUrl = "./image/logo/skydrive-logo.png";
 				$this -> dir = $dir;
 				
 			    break;
@@ -308,6 +318,65 @@ class Service {
 		return $pcs;
 
     }
+
+
+	/**
+	  *微软网盘 对象
+	  */
+    private function getMicrosoftDisk() {
+
+        $client_id  = '00000000480D0428';
+        $client_secret = 'jb9P9V8b5V0DLawPLAVQlfaAmJlRm-pk';
+
+        // Check whether to use HTTPS and set the callback URL
+        $protocol = (!empty($_SERVER['HTTPS'])) ? 'https' : 'http';
+        $callback = $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+        $callback = "http://www.xuhui.com/yun/frame.php?drive=microsoft";
+
+        $access_token_code = "skydrive_access_token";
+
+        $ret = false;
+        // echo "_SESSION['$access_token_code']".$_SESSION[$access_token_code];
+        // echo "<br>";
+        if (isset($_SESSION[$access_token_code])) { // 如果session中有acces_token，已经授权登陆成功，直接返回即可
+            $ret = array (
+                    'oauth_token' => $_SESSION [$access_token_code]
+            );
+        }elseif (isset($_REQUEST['code'])) { // 能在request中获取code，是authorize_code，然后获取access_code
+        	unset($_SESSION[$access_token_code]); // 先清空一下access_code
+
+            $url = "https://login.live.com/oauth20_token.srf?".
+            			"code=".$_REQUEST['code'].
+            			"&grant_type=authorization_code".
+            			"&client_id=$client_id".
+            			"&client_secret=$client_secret".
+            			"&redirect_uri=".urlencode($callback);
+            echo "url=$url";
+
+            $response = $this->request($url, 'POST');
+            if ($response != false) {
+                $token = json_decode ( $response, true );
+                var_dump($token);
+                $_SESSION[$access_token_code] = $token['access_token'];
+            }
+
+        }else {
+            header("Location:"."https://login.live.com/oauth20_authorize.srf?response_type=code".
+            						"&client_id=".$client_id.
+                    				"&scope=wl.basic+wl.signin+wl.skydrive+wl.skydrive_update".
+            						"&redirect_uri=".urlencode($callback));
+            exit();
+        }
+
+        $access_token = $_SESSION[$access_token_code];
+
+		//var_dump($pcs);
+		return $access_token;
+
+    }
+
+
 	/* 获取网盘的容量信息 */
 	function get_quota() {
 		$result = array();
@@ -349,6 +418,15 @@ class Service {
 				} else {
 				    echo json_encode($data);
 				}
+				break;
+			case 'microsoft':
+				/* 查询配额空间和已使用空间 */
+				$skydrive_access_token = $this -> getMicrosoftDisk();
+				$url = "http://apis.live.net/v5.0/me/skydrive/quota?access_token=".$skydrive_access_token;
+				//echo "$url";
+				///$response = $this->request($url, 'GET');
+				//var_dump($response);
+
 				break;
 			default :
 			    break;
