@@ -51,6 +51,17 @@ ul,li{
 }
 #used {
 	height:260px;
+	border:1px solid gray;
+}
+#addService {
+	width: 20px;
+	border:1px solid gray;
+	text-align: center;
+}
+#delService {
+	width: 20px;
+	border:1px solid gray;
+	text-align: center;
 }
 
 #unused {

@@ -30,6 +30,14 @@
 	
 	<div id="left">
 		<ul id="used">
+			<li style="height:40px;width:80px;">
+				<div id="addService">
+					<a title="添加服务" href="javascript:alert('TODO: 仿照mac风格添加服务，边框样式需要调整')">+</a>
+				</div>
+				<div id="delService">
+					<a title="删除服务" href="javascript:alert('TODO: 删除服务')">-</a>
+				</div>
+			</li>
 			<li><a href="/yun/frame.php?drive=dropbox">dropbox</a></li>
 			<li><a href="/yun/frame.php?drive=sina">SINA微盘</a></li>
 			<li><a href="/yun/frame.php?drive=kingsoft">金山网盘</a></li>

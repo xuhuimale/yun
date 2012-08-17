@@ -235,25 +235,11 @@ class Service {
 		$_SESSION[Kuaipan::SKEY_ACCESS_TOKEN] = $oauth_token;
 		$_SESSION[Kuaipan::SKEY_ACCESS_SECRET] = $oauth_verifier;
 
-//		echo "oauth_token=$oauth_token <br>";
-//		echo "oauth_verifier=$oauth_verifier <br>";
-//		echo "_SESSION[\"oauth_token\"]=".($_SESSION[Kuaipan::SKEY_ACCESS_TOKEN])."<br>";
-//		echo "_SESSION[\"oauth_verifier\"]={$_SESSION[Kuaipan::SKEY_ACCESS_SECRET]}<br>";
-		$token = $kp->getAccessToken($_SESSION[Kuaipan::SKEY_ACCESS_TOKEN], $_SESSION[Kuaipan::SKEY_ACCESS_SECRET]);
-		
-//		var_dump($token);
-        if (empty ( $token ['oauth_token'] ) || empty ( $token ['oauth_token_secret'] )) {
-			unset($_SESSION[Kuaipan::SKEY_ACCESS_TOKEN]);
-			unset($_SESSION[Kuaipan::SKEY_ACCESS_SECRET]);
-			$authorization_uri = $kp->getAuthorizationUri ( $config ['cb_uri'] );
-			if (false === $authorization_uri) {
-			    echo 'request token error' . '<br />';
-			    echo nl2br ( var_export ( $kp->getError () ) );
-			    exit ();
-			} else {
-			    header ( 'Location:' . $authorization_uri );
-			}
-        }
+		echo "oauth_token=$oauth_token <br>";
+		echo "oauth_verifier=$oauth_verifier <br>";
+		echo "_SESSION[\"oauth_token\"]=".($_SESSION[Kuaipan::SKEY_ACCESS_TOKEN])."<br>";
+		echo "_SESSION[\"oauth_verifier\"]={$_SESSION[Kuaipan::SKEY_ACCESS_SECRET]}<br>";
+
 		return $kp;
 
     }
@@ -352,12 +338,12 @@ class Service {
             			"&client_id=$client_id".
             			"&client_secret=$client_secret".
             			"&redirect_uri=".urlencode($callback);
-            echo "url=$url";
+            // echo "url=$url";
 
             $response = $this->request($url, 'POST');
             if ($response != false) {
                 $token = json_decode ( $response, true );
-                var_dump($token);
+                // var_dump($token);
                 $_SESSION[$access_token_code] = $token['access_token'];
             }
 
@@ -422,11 +408,17 @@ class Service {
 			case 'microsoft':
 				/* 查询配额空间和已使用空间 */
 				$skydrive_access_token = $this -> getMicrosoftDisk();
-				$url = "http://apis.live.net/v5.0/me/skydrive/quota?access_token=".$skydrive_access_token;
-				//echo "$url";
-				///$response = $this->request($url, 'GET');
-				//var_dump($response);
+				$url = "https://apis.live.net/v5.0/me/skydrive/quota?access_token=".$skydrive_access_token;
 
+				//echo "$url";
+				$response = $this->request($url, 'GET');
+				// var_dump($response);
+	            if ($response != false) {
+	                $quota = json_decode ( $response, true );
+	                
+					$result["used"] = $quota['quota'] - $quota['available'];
+					$result["total"] = $quota['quota'];
+	            }
 				break;
 			default :
 			    break;
